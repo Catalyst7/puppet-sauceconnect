@@ -9,6 +9,7 @@ class sauceconnect::daemon($username, $apikey) {
       ensure  => present,
       content => "
 SAUCE_CONNECT=/usr/share/sauce/sc
+SAUCE_CONNECT_ARGS=\"--user ${username} --api-key $apikey --logfile ${logdir}/sauce-connect.log\"
 API_USER=${username}
 API_KEY=${apikey}
 USERNAME=
@@ -21,7 +22,7 @@ LOG_FILE=${logdir}/sc.log
       ensure => 'present',
       mode   => 0755,
       notify => Service['sauce-connect'],
-      source => 'puppet:///modules/sauceconnect/init.d_sauce-connect';
+      source => "puppet:///modules/sauceconnect/sauce-connect.${::osfamily}.init";
   }
 
   service {

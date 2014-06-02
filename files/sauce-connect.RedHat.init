@@ -1,0 +1,55 @@
+#!/bin/sh
+### BEGIN INIT INFO
+# Provides:          sauce-connect
+# Required-Start:    $local_fs $syslog $networking
+# Required-Stop:     $local_fs $syslog $networking
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: Starts Sauce Connect
+# Description:       Starts Sauce Connect, that creates a tunnel with
+# SauceLabs, so all tests done with Sauce OnDemand with this same user, use the
+# tunnel.
+#
+### END INIT INFO
+
+PATH=/sbin:/usr/sbin:/bin:/usr/bin
+DESC="Sauce Connect"
+NAME="sauce-connect"
+PIDFILE=/var/run/$NAME.pid
+SCRIPTNAME=$0
+
+[ -r /etc/default/$NAME ] && . /etc/default/$NAME
+
+DAEMON="$SAUCE_CONNECT"
+DAEMON_ARGS="$SAUCE_CONNECT_ARGS"
+
+. /etc/init.d/functions
+
+case "${1}" in
+    start)
+        success "Starting ${DESC}..."
+        daemon --pidfile=$PIDFILE $DAEMON --pidfile $PIDFILE $DAEMON_ARGS &
+        ;;
+
+    stop)
+        success "Stopping ${DESC}..."
+        killproc -p $PIDFILE $DAEMON
+        ;;
+
+    restart)
+        ${0} stop
+        sleep 1
+        ${0} start
+        ;;
+
+    status)
+        status -p $PIDFILE $DAEMON
+        ;;
+
+    *)
+        echo "Usage: ${0} {start|stop|restart}"
+        exit 1
+        ;;
+esac
+
+exit $?
